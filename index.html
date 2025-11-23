@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kosmik Samalyot Janglari</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(255, 138, 0, 0.3);
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(218, 27, 96, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(218, 27, 96, 0.6);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .instructions h2 {
+            margin-bottom: 15px;
+            color: #ffcc00;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .upgrades {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .upgrade-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .upgrade-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .upgrade-card h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+
+        .upgrade-card p {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .upgrade-cost {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cost {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .game-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            button {
+                width: 80%;
+            }
+
+            .game-area {
+                height: 400px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.7rem;
+            }
+
+            .game-area {
+                height: 300px;
+            }
+
+            .upgrades {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Stars background */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+        }
+
+        /* Mobile controls */
+        .mobile-controls {
+            display: none;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 0 20px;
+        }
+
+        .mobile-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .mobile-shoot {
+            background: rgba(255, 0, 0, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-controls {
+                display: flex;
+            }
+        }
+
+        /* Power-up effects */
+        .power-up {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>KOSMIK SAMALYOT JANGLARI</h1>
+            <p>Samalyotingizni boshqaring, dushmanlarni yo'q qiling va koinotda hukmronlik qiling!</p>
+        </header>
+
+        <div class="game-info">
+            <div class="info-item">
+                <div>Ball</div>
+                <div class="info-value" id="score">0</div>
+            </div>
+            <div class="info-item">
+                <div>Hayot</div>
+                <div class="info-value" id="lives">5</div>
+            </div>
+            <div class="info-item">
+                <div>Daraja</div>
+                <div class="info-value" id="level">1</div>
+            </div>
+            <div class="info-item">
+                <div>Pul</div>
+                <div class="info-value" id="money">200</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="stars" id="stars"></div>
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <div class="mobile-controls">
+            <div class="mobile-btn" id="leftBtn">←</div>
+            <div class="mobile-btn mobile-shoot" id="shootBtn">⚡</div>
+            <div class="mobile-btn" id="rightBtn">→</div>
+        </div>
+
+        <div class="controls">
+            <button id="startBtn">O'yinni Boshlash</button>
+            <button id="pauseBtn">Pauza</button>
+            <button id="restartBtn">Qayta Boshlash</button>
+        </div>
+
+        <div class="instructions">
+            <h2>Qanday O'ynash Kerak</h2>
+            <ul>
+                <li><strong>Harakatlantirish:</strong> Samalyotingizni chapga va o'ngga harakatlantirish uchun chap va
+                    o'ng strelka tugmalaridan foydalaning.</li>
+                <li><strong>O'q otish:</strong> Dushman samalyotlariga o'q otish uchun probel yoki "W" tugmasini bosing.
+                </li>
+                <li><strong>Maqsad:</strong> Dushman samalyotlarini yo'q qiling va ball to'plang.</li>
+                <li><strong>Bonuslar:</strong> Yashil bonuslarni to'plang va kuchlangan rejimga o'ting!</li>
+            </ul>
+        </div>
+
+        <div class="upgrades">
+            <div class="upgrade-card">
+                <h3>Tezlikni Oshirish</h3>
+                <p>Samalyotingizning harakat tezligini oshiradi.</p>
+                <div class="upgrade-cost">
+                    <span>Narxi:</span>
+                    <span class="cost">50</span>
+                    <button class="buy-btn" data-upgrade="speed">Sotib Olish</button>
+                </div>
+            </div>
+            <div class="upgrade-card">
+                <h3>Kuchliroq O'q</h3>
+                <p>O'qlaringizning zarar kuchini oshiradi.</p>
+                <div class="upgrade-cost">
+                    <span>Narxi:</span>
+                    <span class="cost">75</span>
+                    <button class="buy-btn" data-upgrade="damage">Sotib Olish</button>
+                </div>
+            </div>
+            <div class="upgrade-card">
+                <h3>3-Lazer O'q</h3>
+                <p>Bir vaqtning o'zida 3 ta o'q otish imkoniyati.</p>
+                <div class="upgrade-cost">
+                    <span>Narxi:</span>
+                    <span class="cost">100</span>
+                    <button class="buy-btn" data-upgrade="tripleShot">Sotib Olish</button>
+                </div>
+            </div>
+            <div class="upgrade-card">
+                <h3>Qo'shimcha Hayot</h3>
+                <p>Samalyotingizga qo'shimcha hayot beradi.</p>
+                <div class="upgrade-cost">
+                    <span>Narxi:</span>
+                    <span class="cost">150</span>
+                    <button class="buy-btn" data-upgrade="health">Sotib Olish</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2023 Kosmik Samalyot Janglari. Barcha huquqlar himoyalangan.</p>
+        </footer>
+    </div>
+
+    <script>
+        // O'yin o'zgaruvchilari
+        let score = 0;
+        let lives = 5; // Ko'proq hayot
+        let level = 1;
+        let money = 200; // Ko'proq pul
+        let gameRunning = false;
+        let gamePaused = false;
+        let lastShotTime = 0;
+        let fireRate = 300; // Tezroq o'q otish
+        let tripleShot = false;
+        let powerUpActive = false;
+        let powerUpEndTime = 0;
+
+        // Canvas va kontekst
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // O'yin elementlari
+        let player = {
+            x: 0,
+            y: 0,
+            width: 50,
+            height: 50,
+            speed: 8, // Tezroq harakat
+            color: '#3498db'
+        };
+
+        let bullets = [];
+        let enemies = [];
+        let particles = [];
+        let powerUps = [];
+
+        // Yulduzlar fonini yaratish
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '';
+
+            for (let i = 0; i < 150; i++) { // Ko'proq yulduz
+                const star = document.createElement('div');
+                star.classList.add('star');
+
+                // Tasodifiy o'lcham va joylashuv
+                const size = Math.random() * 3;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+
+                // Tasodifiy oppoq rang
+                const opacity = Math.random() * 0.8 + 0.2;
+                star.style.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
+
+                // Yulduzlarga tebranish effekti
+                star.style.animation = `pulse ${Math.random() * 5 + 3}s infinite`;
+
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Canvas o'lchamini sozlash
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            // O'yinchi joylashuvi
+            player.x = canvas.width / 2 - player.width / 2;
+            player.y = canvas.height - player.height - 20;
+        }
+
+        // O'yinni boshlash
+        function startGame() {
+            if (!gameRunning) {
+                gameRunning = true;
+                gamePaused = false;
+                score = 0;
+                lives = 5;
+                level = 1;
+                money = 200;
+                bullets = [];
+                enemies = [];
+                particles = [];
+                powerUps = [];
+                tripleShot = false;
+                powerUpActive = false;
+
+                updateUI();
+                gameLoop();
+
+                // Dushmanlar yaratish
+                setInterval(createEnemy, 1500); // Tezroq dushman paydo bo'lishi
+
+                // Bonuslar yaratish
+                setInterval(createPowerUp, 8000);
+            }
+        }
+
+        // O'yinni pauza qilish
+        function pauseGame() {
+            gamePaused = !gamePaused;
+            document.getElementById('pauseBtn').textContent = gamePaused ? 'Davom Etish' : 'Pauza';
+            if (!gamePaused) {
+                gameLoop();
+            }
+        }
+
+        // O'yinni qayta boshlash
+        function restartGame() {
+            gameRunning = false;
+            startGame();
+        }
+
+        // O'yin sikl
+        function gameLoop() {
+            if (!gameRunning || gamePaused) return;
+
+            // Canvasni tozalash
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Fon chizish
+            drawBackground();
+
+            // O'yinchi chizish
+            drawPlayer();
+
+            // O'qlar chizish va harakatlantirish
+            updateBullets();
+
+            // Dushmanlar chizish va harakatlantirish
+            updateEnemies();
+
+            // Bonuslarni chizish va harakatlantirish
+            updatePowerUps();
+
+            // Zarrachalar chizish
+            updateParticles();
+
+            // To'qnashuvlarni tekshirish
+            checkCollisions();
+
+            // Kuchlangan rejimni tekshirish
+            checkPowerUp();
+
+            // Keyingi kadr
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Fon chizish
+        function drawBackground() {
+            // Gradient fon
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#0f0c29');
+            gradient.addColorStop(0.5, '#302b63');
+            gradient.addColorStop(1, '#24243e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // O'yinchi chizish
+        function drawPlayer() {
+            // O'yinchi korpusi
+            ctx.fillStyle = powerUpActive ? '#ffcc00' : player.color;
+            ctx.beginPath();
+            ctx.moveTo(player.x + player.width / 2, player.y);
+            ctx.lineTo(player.x + player.width, player.y + player.height);
+            ctx.lineTo(player.x, player.y + player.height);
+            ctx.closePath();
+            ctx.fill();
+
+            // O'yinchi uchun yorug'lik effekti
+            ctx.fillStyle = powerUpActive ? 'rgba(255, 204, 0, 0.5)' : 'rgba(52, 152, 219, 0.3)';
+            ctx.beginPath();
+            ctx.arc(player.x + player.width / 2, player.y + player.height, player.width / 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Kuchlangan rejimda qo'shimcha effekt
+            if (powerUpActive) {
+                ctx.strokeStyle = '#ffcc00';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(player.x + player.width / 2, player.y + player.height, player.width / 2 + 5, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        // O'q yaratish
+        function shoot() {
+            if (!gameRunning || gamePaused) return;
+
+            const currentTime = Date.now();
+            if (currentTime - lastShotTime < fireRate) return;
+
+            lastShotTime = currentTime;
+
+            if (tripleShot) {
+                // 3 ta o'q
+                bullets.push({
+                    x: player.x + player.width / 2 - 2.5,
+                    y: player.y,
+                    width: 5,
+                    height: 15,
+                    speed: 10,
+                    color: '#ff9900'
+                });
+
+                bullets.push({
+                    x: player.x + player.width / 4 - 2.5,
+                    y: player.y,
+                    width: 5,
+                    height: 15,
+                    speed: 10,
+                    color: '#ff9900',
+                    angle: -0.2
+                });
+
+                bullets.push({
+                    x: player.x + 3 * player.width / 4 - 2.5,
+                    y: player.y,
+                    width: 5,
+                    height: 15,
+                    speed: 10,
+                    color: '#ff9900',
+                    angle: 0.2
+                });
+            } else {
+                // Oddiy o'q
+                bullets.push({
+                    x: player.x + player.width / 2 - 2.5,
+                    y: player.y,
+                    width: 5,
+                    height: 15,
+                    speed: 10, // Tezroq o'q
+                    color: powerUpActive ? '#ff9900' : '#ffcc00'
+                });
+            }
+        }
+
+        // O'qlarni yangilash
+        function updateBullets() {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const bullet = bullets[i];
+
+                // O'q harakati
+                bullet.y -= bullet.speed;
+                if (bullet.angle) {
+                    bullet.x += Math.sin(bullet.angle) * 5;
+                }
+
+                // O'q chizish
+                ctx.fillStyle = bullet.color;
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+
+                // O'q effekti
+                ctx.fillStyle = powerUpActive ? 'rgba(255, 153, 0, 0.5)' : 'rgba(255, 204, 0, 0.5)';
+                ctx.beginPath();
+                ctx.arc(bullet.x + bullet.width / 2, bullet.y + bullet.height, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // O'q ekrandan chiqib ketganligini tekshirish
+                if (bullet.y + bullet.height < 0 ||
+                    bullet.x < 0 ||
+                    bullet.x > canvas.width) {
+                    bullets.splice(i, 1);
+                }
+            }
+        }
+
+        // Dushman yaratish
+        function createEnemy() {
+            if (!gameRunning || gamePaused) return;
+
+            const enemyWidth = 40;
+            const enemyHeight = 40;
+
+            enemies.push({
+                x: Math.random() * (canvas.width - enemyWidth),
+                y: -enemyHeight,
+                width: enemyWidth,
+                height: enemyHeight,
+                speed: 2 + Math.random() * 3, // Tezroq dushmanlar
+                color: '#e74c3c',
+                health: 1
+            });
+        }
+
+        // Dushmanlarni yangilash
+        function updateEnemies() {
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const enemy = enemies[i];
+
+                // Dushman harakati
+                enemy.y += enemy.speed;
+
+                // Dushman chizish
+                ctx.fillStyle = enemy.color;
+                ctx.beginPath();
+                ctx.moveTo(enemy.x, enemy.y + enemy.height);
+                ctx.lineTo(enemy.x + enemy.width / 2, enemy.y);
+                ctx.lineTo(enemy.x + enemy.width, enemy.y + enemy.height);
+                ctx.closePath();
+                ctx.fill();
+
+                // Dushman effekti
+                ctx.fillStyle = 'rgba(231, 76, 60, 0.3)';
+                ctx.beginPath();
+                ctx.arc(enemy.x + enemy.width / 2, enemy.y + enemy.height, enemy.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Dushman ekrandan chiqib ketganligini tekshirish
+                if (enemy.y > canvas.height) {
+                    enemies.splice(i, 1);
+                }
+            }
+        }
+
+        // Bonus yaratish
+        function createPowerUp() {
+            if (!gameRunning || gamePaused) return;
+
+            powerUps.push({
+                x: Math.random() * (canvas.width - 30),
+                y: -30,
+                width: 30,
+                height: 30,
+                speed: 3,
+                type: Math.random() > 0.5 ? 'triple' : 'rapid'
+            });
+        }
+
+        // Bonuslarni yangilash
+        function updatePowerUps() {
+            for (let i = powerUps.length - 1; i >= 0; i--) {
+                const powerUp = powerUps[i];
+
+                // Bonus harakati
+                powerUp.y += powerUp.speed;
+
+                // Bonus chizish
+                ctx.fillStyle = powerUp.type === 'triple' ? '#00ff00' : '#ff00ff';
+                ctx.beginPath();
+                ctx.arc(powerUp.x + powerUp.width / 2, powerUp.y + powerUp.height / 2, powerUp.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Yonib o'chib turuvchi effekt
+                ctx.strokeStyle = powerUp.type === 'triple' ? '#00ff00' : '#ff00ff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(powerUp.x + powerUp.width / 2, powerUp.y + powerUp.height / 2, powerUp.width / 2 + 3, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Bonus ekrandan chiqib ketganligini tekshirish
+                if (powerUp.y > canvas.height) {
+                    powerUps.splice(i, 1);
+                }
+            }
+        }
+
+        // Zarrachalarni yangilash
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const particle = particles[i];
+
+                // Zarracha harakati
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                particle.alpha -= 0.02;
+
+                // Zarracha chizish
+                ctx.fillStyle = `rgba(${particle.color}, ${particle.alpha})`;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Zarracha o'chirish
+                if (particle.alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        // Portlash effekti yaratish
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) { // Ko'proq zarrachalar
+                particles.push({
+                    x: x,
+                    y: y,
+                    size: Math.random() * 5 + 2,
+                    vx: (Math.random() - 0.5) * 8, // Tezroq harakat
+                    vy: (Math.random() - 0.5) * 8,
+                    color: color,
+                    alpha: 1
+                });
+            }
+        }
+
+        // To'qnashuvlarni tekshirish
+        function checkCollisions() {
+            // O'q va dushman to'qnashuvi
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const bullet = bullets[i];
+
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    const enemy = enemies[j];
+
+                    if (
+                        bullet.x < enemy.x + enemy.width &&
+                        bullet.x + bullet.width > enemy.x &&
+                        bullet.y < enemy.y + enemy.height &&
+                        bullet.y + bullet.height > enemy.y
+                    ) {
+                        // To'qnashuv
+                        createExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, '231, 76, 60');
+
+                        // O'q va dushmanni olib tashlash
+                        bullets.splice(i, 1);
+                        enemies.splice(j, 1);
+
+                        // Ball qo'shish
+                        score += 15; // Ko'proq ball
+                        money += 8; // Ko'proq pul
+
+                        // UI yangilash
+                        updateUI();
+
+                        break;
+                    }
+                }
+            }
+
+            // O'yinchi va dushman to'qnashuvi
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const enemy = enemies[i];
+
+                if (
+                    player.x < enemy.x + enemy.width &&
+                    player.x + player.width > enemy.x &&
+                    player.y < enemy.y + enemy.height &&
+                    player.y + player.height > enemy.y
+                ) {
+                    // To'qnashuv
+                    createExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, '231, 76, 60');
+                    createExplosion(player.x + player.width / 2, player.y + player.height / 2, '52, 152, 219');
+
+                    // Dushmanni olib tashlash
+                    enemies.splice(i, 1);
+
+                    // Hayot yo'qotish
+                    loseLife();
+
+                    break;
+                }
+            }
+
+            // O'yinchi va bonus to'qnashuvi
+            for (let i = powerUps.length - 1; i >= 0; i--) {
+                const powerUp = powerUps[i];
+
+                if (
+                    player.x < powerUp.x + powerUp.width &&
+                    player.x + player.width > powerUp.x &&
+                    player.y < powerUp.y + powerUp.height &&
+                    player.y + player.height > powerUp.y
+                ) {
+                    // Bonusni olib tashlash
+                    powerUps.splice(i, 1);
+
+                    // Bonus effekti
+                    activatePowerUp(powerUp.type);
+
+                    break;
+                }
+            }
+        }
+
+        // Bonusni faollashtirish
+        function activatePowerUp(type) {
+            powerUpActive = true;
+            powerUpEndTime = Date.now() + 10000; // 10 soniya
+
+            if (type === 'triple') {
+                tripleShot = true;
+            } else if (type === 'rapid') {
+                fireRate = 100; // Juda tez o'q otish
+            }
+
+            // Bonus olganda ball
+            score += 30;
+            updateUI();
+        }
+
+        // Bonus vaqtini tekshirish
+        function checkPowerUp() {
+            if (powerUpActive && Date.now() > powerUpEndTime) {
+                powerUpActive = false;
+                tripleShot = false;
+                fireRate = 300;
+            }
+        }
+
+        // Hayot yo'qotish
+        function loseLife() {
+            lives--;
+            updateUI();
+
+            if (lives <= 0) {
+                gameOver();
+            }
+        }
+
+        // O'yin tugashi
+        function gameOver() {
+            gameRunning = false;
+            alert(`O'yin tugadi! Sizning ballingiz: ${score}`);
+        }
+
+        // UI yangilash
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('lives').textContent = lives;
+            document.getElementById('level').textContent = level;
+            document.getElementById('money').textContent = money;
+        }
+
+        // Yangilash sotib olish
+        function buyUpgrade(type) {
+            let cost = 0;
+
+            switch (type) {
+                case 'speed':
+                    cost = 50;
+                    if (money >= cost) {
+                        player.speed += 1;
+                        money -= cost;
+                    }
+                    break;
+                case 'damage':
+                    cost = 75;
+                    if (money >= cost) {
+                        // O'q zararini oshirish
+                        money -= cost;
+                    }
+                    break;
+                case 'tripleShot':
+                    cost = 100;
+                    if (money >= cost) {
+                        tripleShot = true;
+                        money -= cost;
+                    }
+                    break;
+                case 'health':
+                    cost = 150;
+                    if (money >= cost) {
+                        lives += 1;
+                        money -= cost;
+                    }
+                    break;
+            }
+
+            updateUI();
+        }
+
+        // Klaviatura boshqaruvi
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning || gamePaused) return;
+
+            switch (e.key) {
+                case 'ArrowLeft':
+                    player.x = Math.max(0, player.x - player.speed);
+                    break;
+                case 'ArrowRight':
+                    player.x = Math.min(canvas.width - player.width, player.x + player.speed);
+                    break;
+                case ' ':
+                case 'w':
+                case 'W':
+                    shoot();
+                    break;
+            }
+        });
+
+        // Mobil boshqaruv
+        document.getElementById('leftBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameRunning || gamePaused) return;
+            player.x = Math.max(0, player.x - player.speed);
+        });
+
+        document.getElementById('rightBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameRunning || gamePaused) return;
+            player.x = Math.min(canvas.width - player.width, player.x + player.speed);
+        });
+
+        document.getElementById('shootBtn').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            shoot();
+        });
+
+        // Tugmalar boshqaruvi
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        document.getElementById('pauseBtn').addEventListener('click', pauseGame);
+        document.getElementById('restartBtn').addEventListener('click', restartGame);
+
+        // Yangilash tugmalari
+        document.querySelectorAll('.buy-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const upgradeType = button.getAttribute('data-upgrade');
+                buyUpgrade(upgradeType);
+            });
+        });
+
+        // Dastlabki sozlash
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            createStars();
+            updateUI();
+        });
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+        });
+    </script>
+</body>
+
+</html>
